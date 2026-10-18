@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для любимой 🎄💕</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="bg-layer" id="bgLayer"></div>
+
+    <main class="card">
+        <div class="cat">🐱</div>
+
+        <!-- ЭКРАН 1: КВИЗ -->
+        <div id="quiz">
+            <h1 id="question">Загрузка...</h1>
+            <div id="buttons" class="buttons"></div>
+            <div id="inputArea" class="input-area hidden">
+                <input type="text" id="answerInput" placeholder="Напиши здесь..." autocomplete="off">
+                <button id="submitBtn">Ответить 💌</button>
+            </div>
+            <p id="hint" class="hint"></p>
+        </div>
+
+        <!-- ЭКРАН 2: ФИНАЛ -->
+        <div id="final" class="final hidden">
+            <div class="big-cats">🐱💖🐱</div>
+            <h1>С Новым годом, любимая! 🎄</h1>
+            <p id="finalText"></p>
+            
+            <button id="showGalleryBtn" style="margin-bottom: 12px; background: linear-gradient(135deg, #7bb5ff, #4a90e2);">Наш год в фотографиях 📸</button>
+            <button id="restartBtn">Пройти ещё раз 🔁</button>
+        </div>
+
+        <!-- ЭКРАН 3: ВЫБОР СЕЗОНА -->
+        <div id="seasonsMenu" class="seasons-menu hidden">
+            <h2>Выбери время года ❄️☀️</h2>
+            <div class="season-buttons">
+                <button id="btnWinter" class="season-btn winter-btn">❄️ Зима ❄️</button>
+                <button id="btnSummer" class="season-btn summer-btn">☀️ Лето ☀️</button>
+            </div>
+            <button id="backToFinalBtn1" style="margin-top: 20px;">Назад 💕</button>
+        </div>
+
+        <!-- ЭКРАН 4: ГАЛЕРЕЯ -->
+        <div id="gallery" class="gallery hidden">
+            <h2 id="galleryTitle">Фотографии</h2>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Картинки и видео будут добавляться через JS -->
+            </div>
+            <button id="backToSeasonsBtn" style="margin-top: 20px;">Назад к выбору 🔙</button>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

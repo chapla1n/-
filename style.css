@@ -1,0 +1,291 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ffe0ec 0%, #d6ecff 50%, #fff5fb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow: hidden;
+    position: relative;
+}
+
+.bg-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.floater {
+    position: absolute;
+    animation: floatUp linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes floatUp {
+    0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.8; }
+    90%  { opacity: 0.8; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+
+.snow {
+    position: absolute;
+    top: -5vh;
+    animation: fallDown linear infinite;
+    opacity: 0.9;
+    color: #ffffff;
+    text-shadow: 0 0 6px rgba(150, 200, 255, 0.8);
+}
+
+@keyframes fallDown {
+    0%   { transform: translateY(-5vh) translateX(0) rotate(0deg); }
+    50%  { transform: translateY(50vh) translateX(20px) rotate(180deg); }
+    100% { transform: translateY(105vh) translateX(-20px) rotate(360deg); }
+}
+
+.card {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.93);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 40px 35px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3),
+                0 0 40px rgba(150, 200, 255, 0.35);
+    text-align: center;
+    animation: popIn 0.5s ease;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+.cat {
+    font-size: 64px;
+    margin-bottom: 10px;
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(-5deg); }
+    50%      { transform: rotate(5deg); }
+}
+
+h1, h2 {
+    font-family: 'Pacifico', cursive;
+    color: #d6336c;
+    font-size: 24px;
+    margin-bottom: 25px;
+    line-height: 1.35;
+}
+
+.buttons {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+button {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    background: linear-gradient(135deg, #ff8fb1, #ff5c8a);
+    color: white;
+    box-shadow: 0 4px 14px rgba(255, 92, 138, 0.4);
+    width: 100%;
+}
+
+button:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 22px rgba(255, 92, 138, 0.55);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+.seasons-menu {
+    text-align: center;
+    animation: popIn 0.5s ease;
+}
+
+.seasons-menu h2 {
+    margin-bottom: 20px;
+}
+
+.season-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.season-btn {
+    padding: 25px 20px;
+    font-size: 20px;
+    border-radius: 20px;
+}
+
+.winter-btn {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #1e3c72;
+    box-shadow: 0 4px 14px rgba(30, 60, 114, 0.3);
+}
+
+.winter-btn:hover {
+    box-shadow: 0 8px 22px rgba(30, 60, 114, 0.5);
+}
+
+.summer-btn {
+    background: linear-gradient(135deg, #fceabb, #f8b500);
+    color: #8b5a00;
+    box-shadow: 0 4px 14px rgba(248, 181, 0, 0.4);
+}
+
+.summer-btn:hover {
+    box-shadow: 0 8px 22px rgba(248, 181, 0, 0.6);
+}
+
+.runaway-btn {
+    transition: left 0.35s ease, top 0.35s ease, opacity 0.3s ease;
+    z-index: 9999;
+}
+
+.runaway-btn.vanished {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.5);
+}
+
+.input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#answerInput {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    padding: 14px 18px;
+    border: 2px solid #ffb3cc;
+    border-radius: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+}
+
+#answerInput:focus {
+    border-color: #ff5c8a;
+}
+
+.hint {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #a04a6e;
+    min-height: 20px;
+}
+
+.final h1 {
+    margin-bottom: 15px;
+    font-size: 26px;
+}
+
+.final p {
+    font-size: 17px;
+    color: #7a3b56;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.big-cats {
+    font-size: 48px;
+    margin-bottom: 15px;
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ===== ГАЛЕРЕЯ ===== */
+.gallery {
+    text-align: center;
+    animation: popIn 0.5s ease;
+}
+
+.gallery h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding-right: 5px;
+    margin-bottom: 15px;
+}
+
+.gallery-grid img,
+.gallery-grid video {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.2);
+    transition: transform 0.2s;
+    cursor: pointer;
+    background: #000;
+}
+
+.gallery-grid img:hover {
+    transform: scale(1.05);
+    z-index: 2;
+}
+
+/* Специальные стили для видео, чтобы оно не обрезалось */
+.gallery-grid .gallery-video {
+    grid-column: span 2; /* Растягиваем видео на 2 колонки */
+    width: 100%;
+    height: auto;        /* Убираем жесткую высоту, чтобы сохранить пропорции */
+    max-height: 300px;   /* Ограничиваем максимальную высоту */
+    object-fit: contain; /* Показываем видео целиком, без обрезки */
+    background: #000;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.2);
+    margin-bottom: 5px;
+}
+
+/* Убираем эффект увеличения при наведении на видео */
+.gallery-grid .gallery-video:hover {
+    transform: none;
+}
+
+.gallery-grid::-webkit-scrollbar {
+    width: 6px;
+}
+.gallery-grid::-webkit-scrollbar-thumb {
+    background: #ffb3cc;
+    border-radius: 10px;
+}
