@@ -1,6 +1,6 @@
 // ====== НАСТРОЙКИ ======
-// ВСТАВЬТЕ СЮДА ВАШ URL ИЗ GOOGLE APPS SCRIPT
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpyV7In403Y7kptLw_XVDcbBSzQcSJnv2EmFKAV3VZzqJIVdHMLAEtxvqLV1pYQQwl1A/exec'; 
+// ВСТАВЬТЕ СЮДА ВАШ URL ИЗ GOOGLE APPS SCRIPT (заканчивается на /exec)
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxV52fAdJlvIMjdvLdM-m44T0yYLBmAthyTjntfg66-oezTLQ1OCfhZPXZ75urBk0Z4Cw/exec'; 
 
 const questions = [
     {
@@ -77,6 +77,7 @@ const media = {
 let current = 0;
 let isSending = false;
 
+// Элементы DOM
 const questionEl = document.getElementById('question');
 const buttonsEl  = document.getElementById('buttons');
 const inputArea  = document.getElementById('inputArea');
@@ -94,30 +95,50 @@ const galleryEl      = document.getElementById('gallery');
 const galleryGrid    = document.getElementById('galleryGrid');
 const galleryTitle   = document.getElementById('galleryTitle');
 
-// ====== ОТПРАВКА В GOOGLE ТАБЛИЦУ (ЧЕРЕЗ JSON) ======
+// ====== ОТПРАВКА В GOOGLE ТАБЛИЦУ (СКРЫТАЯ ФОРМА) ======
 function sendToGoogle(questionText, answerText) {
     if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('ВАШ_URL')) {
         console.warn('URL скрипта не указан');
         return;
     }
 
-    // Отправляем как JSON, это самый надежный способ для Apps Script
-    const data = {
-        question: questionText,
-        answer: answerText
-    };
+    // Создаем скрытый iframe
+    const iframe = document.createElement('iframe');
+    iframe.name = 'hidden_iframe_' + Date.now();
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
 
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'text/plain;charset=utf-8', // Обходим CORS-проверки
-        },
-        body: JSON.stringify(data)
-    })
-    .then(() => console.log('✅ Отправлено:', data))
-    .catch(err => console.error('❌ Ошибка:', err));
+    // Создаем форму
+    const form = document.createElement('form');
+    form.action = GOOGLE_SCRIPT_URL;
+    form.method = 'POST';
+    form.target = iframe.name;
+
+    // Поля (имена должны совпадать с заголовками в таблице)
+    const qInput = document.createElement('input');
+    qInput.type = 'hidden';
+    qInput.name = 'question';
+    qInput.value = questionText;
+    form.appendChild(qInput);
+
+    const aInput = document.createElement('input');
+    aInput.type = 'hidden';
+    aInput.name = 'answer';
+    aInput.value = answerText;
+    form.appendChild(aInput);
+
+    document.body.appendChild(form);
+    form.submit();
+
+    // Убираем за собой
+    setTimeout(() => {
+        if (document.body.contains(form)) document.body.removeChild(form);
+        if (document.body.contains(iframe)) document.body.removeChild(iframe);
+    }, 2000);
+    
+    console.log('Отправлено:', questionText, '->', answerText);
 }
-// =======================================
+// =======================================================
 
 function renderQuestion() {
     const q = questions[current];
@@ -142,7 +163,7 @@ function renderQuestion() {
                 if (isSending) return;
                 isSending = true;
                 sendToGoogle(q.text, label);
-                setTimeout(nextQuestion, 200); 
+                setTimeout(nextQuestion, 300); 
             };
 
             if (hoverHint) {
@@ -162,6 +183,7 @@ function renderQuestion() {
     }
 }
 
+// ====== УБЕГАЮЩАЯ КНОПКА ======
 function addRunawayButton(config) {
     const btn = document.createElement('button');
     btn.textContent = config.label;
@@ -223,7 +245,7 @@ function checkInput() {
         if (isSending) return;
         isSending = true;
         sendToGoogle(q.text, answerInput.value.trim()); 
-        setTimeout(nextQuestion, 200);
+        setTimeout(nextQuestion, 300);
     } else {
         hintEl.textContent = 'Хм, попробуй ещё раз 💭 ' + (q.hint || '');
         answerInput.value = '';
@@ -247,6 +269,7 @@ restartBtn.onclick = () => {
     renderQuestion();
 };
 
+// ====== НАВИГАЦИЯ ПО ГАЛЕРЕЕ ======
 showGalleryBtn.onclick = () => { finalEl.classList.add('hidden'); seasonsMenuEl.classList.remove('hidden'); };
 document.getElementById('backToFinalBtn1').onclick = () => { seasonsMenuEl.classList.add('hidden'); finalEl.classList.remove('hidden'); };
 document.getElementById('btnWinter').onclick = () => openGallery('winter', 'Зима ❄️');
@@ -268,6 +291,7 @@ function openGallery(season, title) {
     galleryEl.classList.remove('hidden');
 }
 
+// ====== ФОН ======
 const bgLayer = document.getElementById('bgLayer');
 const floatSymbols = ['💖', '💕', '💗', '❤️', '💘', '🎄', '🌲', '🎁', '🐱', '🐈', '😻', '🐾'];
 const snowSymbols = ['❄️', '❅', '❆', '✻', '✼'];
