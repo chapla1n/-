@@ -1,11 +1,10 @@
 // ====== НАСТРОЙКИ ======
 // ВСТАВЬТЕ СЮДА ВАШ URL ИЗ GOOGLE APPS SCRIPT
-// Он выглядит примерно так: 'https://script.google.com/macros/s/AKfycb.../exec'
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpyV7In403Y7kptLw_XVDcbBSzQcSJnv2EmFKAV3VZzqJIVdHMLAEtxvqLV1pYQQwl1A/exec'; 
 
 const questions = [
     {
-        text: "Масечка, понравился ли тебе этот год со мной? 💕",
+        text: "Любимая, понравился ли тебе этот год со мной? 💕",
         type: "buttons",
         options: ["Лучший год в моей жизни ✨"],
         runaway: {
@@ -58,7 +57,6 @@ const questions = [
 
 const finalMessage = "Масечка моя, спасибо, что ты есть. Этот год с тобой — лучшее, что случилось со мной. Пусть следующий принесёт нам ещё больше счастья, смеха и тёплых моментов. С Новым годом, моя зайка! 🎄💕🐱";
 
-// Медиафайлы по сезонам (ТОЛЬКО КАРТИНКИ, БЕЗ ВИДЕО)
 const media = {
     winter: [
         { type: 'image', src: 'images/1.jpg' },
@@ -77,9 +75,8 @@ const media = {
 // =========================================
 
 let current = 0;
-let isSending = false; // Защита от двойного клика
+let isSending = false;
 
-// Элементы DOM
 const questionEl = document.getElementById('question');
 const buttonsEl  = document.getElementById('buttons');
 const inputArea  = document.getElementById('inputArea');
@@ -91,33 +88,34 @@ const finalEl    = document.getElementById('final');
 const finalText  = document.getElementById('finalText');
 const restartBtn = document.getElementById('restartBtn');
 
-// Элементы галереи
 const showGalleryBtn = document.getElementById('showGalleryBtn');
 const seasonsMenuEl  = document.getElementById('seasonsMenu');
 const galleryEl      = document.getElementById('gallery');
 const galleryGrid    = document.getElementById('galleryGrid');
 const galleryTitle   = document.getElementById('galleryTitle');
 
-// ====== ОТПРАВКА В GOOGLE ТАБЛИЦУ ======
+// ====== ОТПРАВКА В GOOGLE ТАБЛИЦУ (ЧЕРЕЗ JSON) ======
 function sendToGoogle(questionText, answerText) {
-    // Проверяем, вставлен ли URL
     if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('ВАШ_URL')) {
-        console.warn('URL скрипта не указан, данные не отправлены');
+        console.warn('URL скрипта не указан');
         return;
     }
 
-    const formData = new FormData();
-    // Ключи 'question' и 'answer' должны совпадать с заголовками в таблице
-    formData.append('question', questionText); 
-    formData.append('answer', answerText);
+    // Отправляем как JSON, это самый надежный способ для Apps Script
+    const data = {
+        question: questionText,
+        answer: answerText
+    };
 
     fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        body: formData,
-        mode: 'no-cors' // Важно для работы с Google Apps Script без CORS-ошибок
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8', // Обходим CORS-проверки
+        },
+        body: JSON.stringify(data)
     })
-    .then(() => console.log('✅ Ответ отправлен:', questionText, '->', answerText))
-    .catch(err => console.error('❌ Ошибка отправки:', err));
+    .then(() => console.log('✅ Отправлено:', data))
+    .catch(err => console.error('❌ Ошибка:', err));
 }
 // =======================================
 
@@ -125,7 +123,7 @@ function renderQuestion() {
     const q = questions[current];
     hintEl.textContent = '';
     answerInput.value = '';
-    isSending = false; // Сбрасываем флаг при новом вопросе
+    isSending = false;
 
     questionEl.textContent = q.text;
     buttonsEl.innerHTML = '';
@@ -140,33 +138,23 @@ function renderQuestion() {
             const btn = document.createElement('button');
             btn.textContent = label;
             
-            // Обработчик клика с отправкой данных
             btn.onclick = () => {
-                if (isSending) return; // Защита от двойного клика
+                if (isSending) return;
                 isSending = true;
-                
-                sendToGoogle(q.text, label); // Отправляем данные
-                
-                // Небольшая задержка, чтобы данные успели уйти, и переход
+                sendToGoogle(q.text, label);
                 setTimeout(nextQuestion, 200); 
             };
 
             if (hoverHint) {
-                btn.addEventListener('mouseenter', () => {
-                    hintEl.textContent = hoverHint;
-                });
+                btn.addEventListener('mouseenter', () => { hintEl.textContent = hoverHint; });
                 btn.addEventListener('mouseleave', () => {
-                    if (hintEl.textContent === hoverHint) {
-                        hintEl.textContent = '';
-                    }
+                    if (hintEl.textContent === hoverHint) hintEl.textContent = '';
                 });
             }
             buttonsEl.appendChild(btn);
         });
 
-        if (q.runaway) {
-            addRunawayButton(q.runaway);
-        }
+        if (q.runaway) addRunawayButton(q.runaway);
     } else {
         inputArea.classList.remove('hidden');
         hintEl.textContent = q.hint || '';
@@ -174,7 +162,6 @@ function renderQuestion() {
     }
 }
 
-// ====== УБЕГАЮЩАЯ КНОПКА ======
 function addRunawayButton(config) {
     const btn = document.createElement('button');
     btn.textContent = config.label;
@@ -189,12 +176,9 @@ function addRunawayButton(config) {
         const h = btn.offsetHeight || 50;
         const maxX = window.innerWidth  - w - padding;
         const maxY = window.innerHeight - h - padding;
-
         const x = padding + Math.random() * Math.max(0, maxX - padding);
         const y = padding + Math.random() * Math.max(0, maxY - padding);
-
         if (!btn.style.width) btn.style.width = w + 'px';
-
         btn.style.position = 'fixed';
         btn.style.left = x + 'px';
         btn.style.top  = y + 'px';
@@ -204,17 +188,12 @@ function addRunawayButton(config) {
         e.preventDefault();
         e.stopPropagation();
         if (clicks >= config.maxDodges) return;
-
         jumpAway();
         clicks++;
-
-        // Отправляем в таблицу, что она пыталась нажать "Нет"
-        sendToGoogle("Попытка нажать 'Нет' (вопрос: " + questions[current].text + ")", "Клик №" + clicks);
-
+        sendToGoogle("Попытка нажать 'Нет'", "Клик №" + clicks);
         if (config.messages && config.messages[clicks - 1]) {
             hintEl.textContent = config.messages[clicks - 1];
         }
-
         if (clicks >= config.maxDodges) {
             setTimeout(() => {
                 btn.classList.add('vanished');
@@ -227,11 +206,8 @@ function addRunawayButton(config) {
 function nextQuestion() {
     document.querySelectorAll('.runaway-btn').forEach(b => b.remove());
     current++;
-    if (current >= questions.length) {
-        showFinal();
-    } else {
-        renderQuestion();
-    }
+    if (current >= questions.length) showFinal();
+    else renderQuestion();
 }
 
 function checkInput() {
@@ -244,13 +220,9 @@ function checkInput() {
     }
 
     if (q.answers === null || q.answers.includes(val)) {
-        if (isSending) return; // Защита
+        if (isSending) return;
         isSending = true;
-        
-        // Отправляем введенный текст
         sendToGoogle(q.text, answerInput.value.trim()); 
-        
-        // Переходим дальше
         setTimeout(nextQuestion, 200);
     } else {
         hintEl.textContent = 'Хм, попробуй ещё раз 💭 ' + (q.hint || '');
@@ -259,17 +231,13 @@ function checkInput() {
 }
 
 submitBtn.onclick = checkInput;
-answerInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkInput();
-});
+answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkInput(); });
 
 function showFinal() {
     quizEl.classList.add('hidden');
     finalEl.classList.remove('hidden');
     finalText.textContent = finalMessage;
-    for (let i = 0; i < 25; i++) {
-        setTimeout(createFloater, i * 70);
-    }
+    for (let i = 0; i < 25; i++) setTimeout(createFloater, i * 70);
 }
 
 restartBtn.onclick = () => {
@@ -279,57 +247,27 @@ restartBtn.onclick = () => {
     renderQuestion();
 };
 
-// ====== НАВИГАЦИЯ ПО ГАЛЕРЕЕ ======
-showGalleryBtn.onclick = () => {
-    finalEl.classList.add('hidden');
-    seasonsMenuEl.classList.remove('hidden');
-};
+showGalleryBtn.onclick = () => { finalEl.classList.add('hidden'); seasonsMenuEl.classList.remove('hidden'); };
+document.getElementById('backToFinalBtn1').onclick = () => { seasonsMenuEl.classList.add('hidden'); finalEl.classList.remove('hidden'); };
+document.getElementById('btnWinter').onclick = () => openGallery('winter', 'Зима ❄️');
+document.getElementById('btnSummer').onclick = () => openGallery('summer', 'Лето ☀️');
+document.getElementById('backToSeasonsBtn').onclick = () => { galleryEl.classList.add('hidden'); seasonsMenuEl.classList.remove('hidden'); };
 
-document.getElementById('backToFinalBtn1').onclick = () => {
-    seasonsMenuEl.classList.add('hidden');
-    finalEl.classList.remove('hidden');
-};
-
-document.getElementById('btnWinter').onclick = () => {
-    openGallery('winter', 'Зима ❄️');
-};
-
-document.getElementById('btnSummer').onclick = () => {
-    openGallery('summer', 'Лето ☀️');
-};
-
-document.getElementById('backToSeasonsBtn').onclick = () => {
-    galleryEl.classList.add('hidden');
-    seasonsMenuEl.classList.remove('hidden');
-};
-
-// Функция заполнения галереи
 function openGallery(season, title) {
     galleryTitle.textContent = title;
-    galleryGrid.innerHTML = ''; // очищаем
-
+    galleryGrid.innerHTML = '';
     media[season].forEach(item => {
         if (item.type === 'image') {
             const img = document.createElement('img');
             img.src = item.src;
-            img.alt = title;
             img.onclick = () => window.open(item.src, '_blank');
             galleryGrid.appendChild(img);
-        } else if (item.type === 'video') {
-            const video = document.createElement('video');
-            video.src = item.src;
-            video.controls = true;
-            video.setAttribute('playsinline', '');
-            video.className = 'gallery-video';
-            galleryGrid.appendChild(video);
         }
     });
-
     seasonsMenuEl.classList.add('hidden');
     galleryEl.classList.remove('hidden');
 }
 
-// ====== ФОН: сердечки, снежинки, ёлочки, котики ======
 const bgLayer = document.getElementById('bgLayer');
 const floatSymbols = ['💖', '💕', '💗', '❤️', '💘', '🎄', '🌲', '🎁', '🐱', '🐈', '😻', '🐾'];
 const snowSymbols = ['❄️', '❅', '❆', '✻', '✼'];
@@ -360,6 +298,4 @@ function createSnow() {
 
 setInterval(createFloater, 900);
 setInterval(createSnow, 500);
-
-// Старт
 renderQuestion();
